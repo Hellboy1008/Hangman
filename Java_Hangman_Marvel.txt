@@ -1,0 +1,82 @@
+81
+Hulk
+Iron Man
+Thor
+Captain America
+Wolverine
+Thing
+Magneto
+Nightcrawler
+Juggernaut
+Emma Frost
+Beast
+Spider Man
+Doctor Strange
+Cyclops
+Colossus
+Nick Fury
+Angel
+Gambit
+Hawkeye
+Mr Fantastic
+Mystique
+Red Skull
+Mockingbird
+Jean Grey
+Scarlet Witch
+Quicksilver
+Thanks
+Psylocke
+Professor X
+Daredevil
+Doctor Doom
+Kingpin
+Invisible Woman
+Rogue
+Storm
+Black Panther
+Black Widow
+Venom
+Elektra
+Apocalypse
+Human Torch
+Silver Surfer
+Malekith
+Ronan
+Odin
+Heimdall
+Sif
+Whiplash
+Phil Coulson
+Maria Hill
+The Collector
+Winter Soldier
+Nebula
+Falcon
+Ultron
+Vision
+Adam Warlock
+Gamora
+War Machine
+Drax
+Rocket Racoon
+Star Lord
+Yondu
+Groot
+Loki
+Ant Man
+Wasp
+Vulture
+Cable
+Cyclops
+Dormammu
+Hela
+Ancient One
+Colossus
+Luke Cage
+Iron Fist
+Maximus
+Ghost Rider
+Punisher
+Wong
+Green Goblin

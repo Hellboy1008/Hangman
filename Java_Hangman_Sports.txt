@@ -1,0 +1,42 @@
+41
+Archery
+Badminton
+Baseball
+Softball
+Basketball
+Volleyball
+Boxing
+Kayak
+Climbing
+Cycling
+Diving
+Fencing
+Field Hockey
+Ice Hockey
+Golf
+Gymnastics
+Handball
+Judo
+Karate
+Rowing
+Rugby
+Football
+Soccer
+Sailing
+Swimming
+Surfing
+Table Tennis
+Tennis
+Track
+Water Polo
+Weightlifting
+Wrestling
+Sumo
+Cricket
+Lacrosse
+Squash
+Netball
+Bowling
+Dancing
+Skiing
+Skating
