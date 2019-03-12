@@ -8,26 +8,28 @@ import java.util.ArrayList;
 
 public class Hangman {
 
-    public static boolean playGame = true; // runs the game until the user wants to stop
-    public static boolean guessingPhase = true; // runs the guessing phase until the user wins or loses
-    public static String word = ""; // holds the word the user is trying to guess
-    public static String topic = ""; // holds the topic chosen by the user
-    public static int guessedWrong = 0; // amount of letters guessed wrong by the user
-    public static char[] individualLetters; // holds each individual character of "word"
-    public static ArrayList<String> allWords = new ArrayList<String>(); // holds all the words in one given topic
-    public static ArrayList<Character> lettersGuessed = new ArrayList<Character>(); // holds the letters guessed by user
-    public static ArrayList<Character> lettersGuessedWrong = new ArrayList<Character>(); // holds the letters guessed
-                                                                                         // wrong by user
-    public static File hangmanFile; // holds the text file with the list of words
+    private static String word = ""; // holds the word the user is trying to guess
+    private static String topic = ""; // holds the topic chosen by the user
+    private static int guessedWrong = 0; // amount of letters guessed wrong by the user
+    private static char[] individualLetters; // holds each individual character of "word"
+    private static ArrayList<String> allWords = new ArrayList<String>(); // holds all the words in one given topic
+    private static ArrayList<Character> lettersGuessed = new ArrayList<Character>(); // holds the letters guessed by
+                                                                                     // user
+    private static ArrayList<Character> lettersGuessedWrong = new ArrayList<Character>(); // holds the letters guessed
+                                                                                          // wrong by user
+    private static File hangmanFile; // holds the text file with the list of words
+    private static final int MAX_WRONG = 6;
 
     public static void main(String[] args) throws FileNotFoundException {
+        boolean playGame = true; // runs the game until the user wants to stop
+        boolean guessingPhase = true; // runs the guessing phase until the user wins or loses
+
         // run loop until the user wants to stop playing
         while (playGame == true) {
             // Initial Instructions
             System.out.println("Select a topic for the hangman game and enter the topic in the console");
-            System.out.println(
-                    "Colors, Countries, Elements, League Champions, Marvel Characters, Religions, Sports");
-            System.out.println("Type anything other than the topic to stop the game");
+            System.out.println("Colors, Countries, Elements, League Champions, Marvel Characters, Religions, Sports");
+            System.out.println("Type anything other than the topics to stop the game");
             // Retrieve topic from user
             Scanner topicChoice = new Scanner(System.in);
             topic = topicChoice.next();
@@ -44,7 +46,7 @@ public class Hangman {
                     System.out.print(lettersGuessed.get(i) + " ");
                 }
                 // if the user exceeds 5 wrong guesses, the guessing phase is over and they lose
-                if (guessedWrong == 6) {
+                if (guessedWrong == MAX_WRONG) {
                     System.out.println();
                     guessingPhase = false;
                     break;
@@ -53,7 +55,9 @@ public class Hangman {
                 System.out.println("\nPick a letter:");
                 Scanner guess = new Scanner(System.in);
                 char guessedLetter = guess.next().charAt(0);
-                lettersGuessed.add(guessedLetter);
+                if (lettersGuessed.contains(guessedLetter) == false) {
+                    lettersGuessed.add(guessedLetter);
+                }
                 wrongGuesses(); // check for wrong guesses
                 // check if the user has won
                 if (checkCompletion() == true) {
@@ -64,8 +68,9 @@ public class Hangman {
                 }
             }
             // print win or lose message after the game
-            if (guessedWrong == 6) {
+            if (guessedWrong == MAX_WRONG) {
                 System.out.println("Game Over. Play Again!");
+                System.out.println("Correct Answer: " + word);
             } else {
                 System.out.println("Nice Job!");
             }
