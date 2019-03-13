@@ -160,7 +160,7 @@ public class Hangman {
         System.out.println();
         for (int i = 0; i < word.length(); i++) {
             if (word.charAt(i) == ' ') {
-                System.out.print("  "); // print a space if the word itself has a spacex
+                System.out.print("  "); // print a space if the word itself has a space
             } else {
                 if (lettersGuessed.contains(individualLetters[i])) {
                     System.out.print(individualLetters[i]); // print the letter if it has been guessed
