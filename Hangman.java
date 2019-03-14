@@ -8,45 +8,59 @@ import java.util.ArrayList;
 
 public class Hangman {
 
-    private static String word = ""; // holds the word the user is trying to guess
-    private static String topic = ""; // holds the topic chosen by the user
-    private static int guessedWrong = 0; // amount of letters guessed wrong by the user
+    private static String word; // holds the word the user is trying to guess
+    private static int guessedWrongNum = 0; // amount of letters guessed wrong by the user
     private static char[] individualLetters; // holds each individual character of "word"
     private static ArrayList<String> allWords = new ArrayList<String>(); // holds all the words in one given topic
-    private static ArrayList<Character> lettersGuessed = new ArrayList<Character>(); // holds the letters guessed by
-                                                                                     // user
-    private static ArrayList<Character> lettersGuessedWrong = new ArrayList<Character>(); // holds the letters guessed
-                                                                                          // wrong by user
+    private static ArrayList<Character> guessed = new ArrayList<Character>(); // holds the letters guessed by user
+    private static ArrayList<Character> guessedWrong = new ArrayList<Character>(); // holds the letters guessed wrong by
+                                                                                   // user
     private static File hangmanFile; // holds the text file with the list of words
     private static final int MAX_WRONG = 6;
+    private static final String INSTRUCTIONS = "Select a topic for the hangman game and enter the topic (exactly as shown below) in the console:"
+            + "\nColors, Countries, Elements, League Champions, Marvel Characters, Religions, Sports"
+            + "\nType \"exit\" to exit the game";
+    private static final String COLOR_FILE = "./Java_Hangman_Colors.txt";
+    private static final String COLOR_TOPIC = "colors";
+    private static final String COUNTRY_FILE = "./Java_Hangman_Countries.txt";
+    private static final String COUNTRY_TOPIC = "countries";
+    private static final String ELEMENT_FILE = "./Java_Hangman_Elements.txt";
+    private static final String ELEMENT_TOPIC = "elements";
+    private static final String LEAGUE_FILE = "./Java_Hangman_League.txt";
+    private static final String LEAGUE_TOPIC = "league champions";
+    private static final String MARVEL_FILE = "./Java_Hangman_Marvel.txt";
+    private static final String MARVEL_TOPIC = "marvel characters";
+    private static final String RELIGION_FILE = "./Java_Hangman_Religions.txt";
+    private static final String RELIGION_TOPIC = "religions";
+    private static final String SPORT_FILE = "./Java_Hangman_Sports.txt";
+    private static final String SPORT_TOPIC = "sports";
+    private static final String EXIT = "exit";
+    private static final String TOPIC_DNE = "This topic does not exist";
+    private static final Character SPACE_CHAR = ' ';
 
     public static void main(String[] args) throws FileNotFoundException {
         boolean playGame = true; // runs the game until the user wants to stop
         boolean guessingPhase = true; // runs the guessing phase until the user wins or loses
-
+        Scanner scan = new Scanner(System.in);
         // run loop until the user wants to stop playing
         while (playGame == true) {
             // Initial Instructions
-            System.out.println("Select a topic for the hangman game and enter the topic in the console");
-            System.out.println("Colors, Countries, Elements, League Champions, Marvel Characters, Religions, Sports");
-            System.out.println("Type anything other than the topics to stop the game");
+            System.out.println(INSTRUCTIONS);
             // Retrieve topic from user
-            Scanner topicChoice = new Scanner(System.in);
-            topic = topicChoice.next();
+            String topic = scan.next();
             // Determine the word given the topic
-            determineWord();
-
+            determineWord(topic);
             // run loop until the user either wins or loses
             while (guessingPhase == true) {
                 printHangman(); // print hangman figure
                 printWord(); // print the word using blanks or letters
                 // print the letters guessed by users
                 System.out.print("\n\nLetters Guessed: ");
-                for (int i = 0; i < lettersGuessed.size(); i++) {
-                    System.out.print(lettersGuessed.get(i) + " ");
+                for (int i = 0; i < guessed.size(); i++) {
+                    System.out.print(guessed.get(i) + " ");
                 }
                 // if the user exceeds 5 wrong guesses, the guessing phase is over and they lose
-                if (guessedWrong == MAX_WRONG) {
+                if (guessedWrongNum == MAX_WRONG) {
                     System.out.println();
                     guessingPhase = false;
                     break;
@@ -55,8 +69,8 @@ public class Hangman {
                 System.out.println("\nPick a letter:");
                 Scanner guess = new Scanner(System.in);
                 char guessedLetter = guess.next().charAt(0);
-                if (lettersGuessed.contains(guessedLetter) == false) {
-                    lettersGuessed.add(guessedLetter);
+                if (guessed.contains(guessedLetter) == false) {
+                    guessed.add(guessedLetter);
                 }
                 wrongGuesses(); // check for wrong guesses
                 // check if the user has won
@@ -68,7 +82,7 @@ public class Hangman {
                 }
             }
             // print win or lose message after the game
-            if (guessedWrong == MAX_WRONG) {
+            if (guessedWrongNum == MAX_WRONG) {
                 System.out.println("Game Over. Play Again!");
                 System.out.println("Correct Answer: " + word);
             } else {
@@ -76,10 +90,9 @@ public class Hangman {
             }
             // reset all variables for a new round
             guessingPhase = true;
-            guessedWrong = 0;
+            guessedWrongNum = 0;
             allWords.clear();
-            lettersGuessed.clear();
-            lettersGuessedWrong.clear();
+            guessedWrong.clear();
             individualLetters = null;
         }
     }
@@ -87,7 +100,7 @@ public class Hangman {
     // print hangman figure based on wrong guesses
     public static void printHangman() {
 
-        switch (guessedWrong) {
+        switch (guessedWrongNum) {
         case 0:
             System.out.println(" ________");
             System.out.println("|       |");
@@ -159,10 +172,10 @@ public class Hangman {
     public static void printWord() {
         System.out.println();
         for (int i = 0; i < word.length(); i++) {
-            if (word.charAt(i) == ' ') {
+            if (word.charAt(i) == SPACE_CHAR) {
                 System.out.print("  "); // print a space if the word itself has a space
             } else {
-                if (lettersGuessed.contains(individualLetters[i])) {
+                if (guessed.contains(individualLetters[i])) {
                     System.out.print(individualLetters[i]); // print the letter if it has been guessed
                 } else {
                     System.out.print("__"); // print a blank if the letter has not been guessed
@@ -173,60 +186,52 @@ public class Hangman {
     }
 
     // determine the word using the given topic
-    public static void determineWord() throws FileNotFoundException {
-        topic = topic.toLowerCase();
-        switch (topic) {
-        case "color":
-        case "colors":
-            hangmanFile = new File("./Java_Hangman_Colors.txt");
+    public static void determineWord(String topic) throws FileNotFoundException {
+        switch (topic.toLowerCase()) {
+        case COLOR_TOPIC:
+            hangmanFile = new File(COLOR_FILE);
             break;
-        case "countries":
-            hangmanFile = new File("./Java_Hangman_Countries.txt");
+        case COUNTRY_TOPIC:
+            hangmanFile = new File(COUNTRY_FILE);
             break;
-        case "element":
-        case "elements":
-            hangmanFile = new File("./Java_Hangman_Elements.txt");
+        case ELEMENT_TOPIC:
+            hangmanFile = new File(ELEMENT_FILE);
             break;
-        case "league":
-        case "league champions":
-            hangmanFile = new File("./Java_Hangman_League.txt");
+        case LEAGUE_TOPIC:
+            hangmanFile = new File(LEAGUE_FILE);
             break;
-        case "marvel":
-        case "marvel characters":
-            hangmanFile = new File("./Java_Hangman_Marvel.txt");
+        case MARVEL_TOPIC:
+            hangmanFile = new File(MARVEL_FILE);
             break;
-        case "religion":
-        case "religions":
-            hangmanFile = new File("./Java_Hangman_Religions.txt");
+        case RELIGION_TOPIC:
+            hangmanFile = new File(RELIGION_FILE);
             break;
-        case "sport":
-        case "sports":
-            hangmanFile = new File("./Java_Hangman_Sports.txt");
+        case SPORT_TOPIC:
+            hangmanFile = new File(SPORT_FILE);
             break;
+        case EXIT:
+            System.exit(0);
         default:
+            System.out.println(TOPIC_DNE);
             System.exit(0); // exit the game if the user types anything other than the topics given
         }
-        Scanner scan_words = new Scanner(hangmanFile);
-        int numberOfWords = scan_words.nextInt(); // determine the number of words in the text file
-        for (int i = 0; i <= numberOfWords; i++) {
-            allWords.add(scan_words.nextLine()); // add all the words in the text file to the arraylist
+        // scan file for words
+        Scanner scan = new Scanner(hangmanFile);
+        while (scan.hasNext()) {
+            allWords.add(scan.nextLine());
         }
-        for (int j = 0; j < allWords.size(); j++) {
-            if (allWords.get(j).equals("")) {
-                allWords.remove(j); // remove words that are just blank spaces
-            }
-        }
+        scan.close();
         // chose a random word
         int random = (int) (Math.random() * allWords.size());
         word = allWords.get(random);
         word = word.toLowerCase();
-        // create a array holding each letter of the word
+        // create an array holding each letter of the word
         individualLetters = new char[word.length()];
-        for (int i = 0; i < word.length(); i++) {
-            if (word.charAt(i) == ' ') {
-
+        for (int index = 0; index < word.length(); index++) {
+            if (word.charAt(index) == SPACE_CHAR) {
+                individualLetters[index] = SPACE_CHAR;
             } else {
-                individualLetters[i] = word.charAt(i);
+                individualLetters[index] = word.charAt(index);
             }
         }
     }
@@ -236,10 +241,10 @@ public class Hangman {
         for (int i = 0; i < individualLetters.length; i++) {
             // check if the value of the array null (occurs when there is a space in the
             // word)
-            if (individualLetters[i] == '\u0000') {
+            if (individualLetters[i] == SPACE_CHAR) {
                 continue;
             }
-            if (lettersGuessed.contains(individualLetters[i])) {
+            if (guessed.contains(individualLetters[i])) {
 
             } else {
                 return false;
@@ -250,18 +255,18 @@ public class Hangman {
 
     // check if the letter guessed is wrong
     public static void wrongGuesses() {
-        for (int i = 0; i < lettersGuessed.size(); i++) {
+        for (int i = 0; i < guessed.size(); i++) {
             boolean checkLetter = false;
             for (int j = 0; j < individualLetters.length; j++) {
-                if (lettersGuessed.get(i) == individualLetters[j]) {
+                if (guessed.get(i) == individualLetters[j]) {
                     checkLetter = true;
                     break;
                 }
             }
             if (checkLetter == false) {
-                if (lettersGuessedWrong.contains(lettersGuessed.get(i)) == false) {
-                    lettersGuessedWrong.add(lettersGuessed.get(i));
-                    guessedWrong++;
+                if (guessedWrong.contains(guessed.get(i)) == false) {
+                    guessedWrong.add(guessed.get(i));
+                    guessedWrongNum++;
                 }
             }
         }
