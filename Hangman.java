@@ -20,23 +20,22 @@ public class Hangman {
     private static final String INSTRUCTIONS = "Select a topic for the hangman game and enter the topic (exactly as shown below) in the console:"
             + "\nColors, Countries, Elements, League Champions, Marvel Characters, Religions, Sports"
             + "\nType \"exit\" to exit the game";
-    private static final String COLOR_FILE = "./Java_Hangman_Colors.txt";
-    private static final String COLOR_TOPIC = "colors";
-    private static final String COUNTRY_FILE = "./Java_Hangman_Countries.txt";
-    private static final String COUNTRY_TOPIC = "countries";
-    private static final String ELEMENT_FILE = "./Java_Hangman_Elements.txt";
-    private static final String ELEMENT_TOPIC = "elements";
-    private static final String LEAGUE_FILE = "./Java_Hangman_League.txt";
-    private static final String LEAGUE_TOPIC = "league champions";
-    private static final String MARVEL_FILE = "./Java_Hangman_Marvel.txt";
-    private static final String MARVEL_TOPIC = "marvel characters";
-    private static final String RELIGION_FILE = "./Java_Hangman_Religions.txt";
-    private static final String RELIGION_TOPIC = "religions";
-    private static final String SPORT_FILE = "./Java_Hangman_Sports.txt";
-    private static final String SPORT_TOPIC = "sports";
+    private static final String COLOR_FILE = "./Java_Hangman_Colors.txt", COLOR_TOPIC = "colors";
+    private static final String COUNTRY_FILE = "./Java_Hangman_Countries.txt", COUNTRY_TOPIC = "countries";
+    private static final String ELEMENT_FILE = "./Java_Hangman_Elements.txt", ELEMENT_TOPIC = "elements";
+    private static final String LEAGUE_FILE = "./Java_Hangman_League.txt", LEAGUE_TOPIC = "league champions";
+    private static final String MARVEL_FILE = "./Java_Hangman_Marvel.txt", MARVEL_TOPIC = "marvel characters";
+    private static final String RELIGION_FILE = "./Java_Hangman_Religions.txt", RELIGION_TOPIC = "religions";
+    private static final String SPORT_FILE = "./Java_Hangman_Sports.txt", SPORT_TOPIC = "sports";
     private static final String EXIT = "exit";
     private static final String TOPIC_DNE = "This topic does not exist";
     private static final Character SPACE_CHAR = ' ';
+    private static final String TOP_POLE = " ________", BOTTOM_POLE = "|___________";
+    private static final String HANGMAN_POLE = "|       |", HANGMAN_LEFT_POLE = "|";
+    private static final String HANGMAN_HEAD = "|       O";
+    private static final String HANGMAN_HAND_LEFT = "|    ---|", HANGMAN_HAND_BOTH = "|    ---|---";
+    private static final String HANGMAN_LEFT_LEG_ONE = "|      /", HANGMAN_LEFT_LEG_TWO = "|     /";
+    private static final String HANGMAN_BOTH_LEG_ONE = "|      / \\", HANGMAN_BOTH_LEG_TWO = "|     /   \\";
 
     public static void main(String[] args) throws FileNotFoundException {
         boolean playGame = true; // runs the game until the user wants to stop
@@ -95,6 +94,7 @@ public class Hangman {
             guessedWrong.clear();
             individualLetters = null;
         }
+        scan.close();
     }
 
     // print hangman figure based on wrong guesses
@@ -102,67 +102,67 @@ public class Hangman {
 
         switch (guessedWrongNum) {
         case 0:
-            System.out.println(" ________");
-            System.out.println("|       |");
-            System.out.println("|       ");
-            System.out.println("|    ");
-            System.out.println("|    ");
-            System.out.println("|    ");
-            System.out.println("|_______________");
+            System.out.println(TOP_POLE);
+            System.out.println(HANGMAN_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(BOTTOM_POLE);
             break;
         case 1:
-            System.out.println(" ________");
-            System.out.println("|       |");
-            System.out.println("|       O");
-            System.out.println("|    ");
-            System.out.println("|    ");
-            System.out.println("|    ");
-            System.out.println("|_______________");
+            System.out.println(TOP_POLE);
+            System.out.println(HANGMAN_POLE);
+            System.out.println(HANGMAN_HEAD);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(BOTTOM_POLE);
             break;
-        case 2:
-            System.out.println(" ________");
-            System.out.println("|       |");
-            System.out.println("|       O");
-            System.out.println("|       |");
-            System.out.println("|    ");
-            System.out.println("|    ");
-            System.out.println("|_______________");
+        case MAX_WRONG - 1 - 1 - 1 - 1:
+            System.out.println(TOP_POLE);
+            System.out.println(HANGMAN_POLE);
+            System.out.println(HANGMAN_HEAD);
+            System.out.println(HANGMAN_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(BOTTOM_POLE);
             break;
-        case 3:
-            System.out.println(" ________");
-            System.out.println("|       |");
-            System.out.println("|       O");
-            System.out.println("|    ---|");
-            System.out.println("|    ");
-            System.out.println("|    ");
-            System.out.println("|_______________");
+        case MAX_WRONG - 1 - 1 - 1:
+            System.out.println(TOP_POLE);
+            System.out.println(HANGMAN_POLE);
+            System.out.println(HANGMAN_HEAD);
+            System.out.println(HANGMAN_HAND_LEFT);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(BOTTOM_POLE);
             break;
-        case 4:
-            System.out.println(" ________");
-            System.out.println("|       |");
-            System.out.println("|       O");
-            System.out.println("|    ---|---");
-            System.out.println("|    ");
-            System.out.println("|    ");
-            System.out.println("|_______________");
+        case MAX_WRONG - 1 - 1:
+            System.out.println(TOP_POLE);
+            System.out.println(HANGMAN_POLE);
+            System.out.println(HANGMAN_HEAD);
+            System.out.println(HANGMAN_HAND_BOTH);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(HANGMAN_LEFT_POLE);
+            System.out.println(BOTTOM_POLE);
             break;
-        case 5:
-            System.out.println(" ________");
-            System.out.println("|       |");
-            System.out.println("|       O");
-            System.out.println("|    ---|---");
-            System.out.println("|      /");
-            System.out.println("|     /");
-            System.out.println("|_______________");
+        case MAX_WRONG - 1:
+            System.out.println(TOP_POLE);
+            System.out.println(HANGMAN_POLE);
+            System.out.println(HANGMAN_HEAD);
+            System.out.println(HANGMAN_HAND_BOTH);
+            System.out.println(HANGMAN_LEFT_LEG_ONE);
+            System.out.println(HANGMAN_LEFT_LEG_TWO);
+            System.out.println(BOTTOM_POLE);
             break;
-        case 6:
-            System.out.println(" ________");
-            System.out.println("|       |");
-            System.out.println("|       O");
-            System.out.println("|    ---|---");
-            System.out.println("|      / \\");
-            System.out.println("|     /   \\");
-            System.out.println("|_______________");
+        case MAX_WRONG:
+            System.out.println(TOP_POLE);
+            System.out.println(HANGMAN_POLE);
+            System.out.println(HANGMAN_HEAD);
+            System.out.println(HANGMAN_HAND_BOTH);
+            System.out.println(HANGMAN_BOTH_LEG_ONE);
+            System.out.println(HANGMAN_BOTH_LEG_TWO);
+            System.out.println(BOTTOM_POLE);
             break;
         }
 
