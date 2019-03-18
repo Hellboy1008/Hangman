@@ -15,27 +15,32 @@ public class Hangman {
     private static ArrayList<Character> guessed = new ArrayList<Character>(); // holds the letters guessed by user
     private static ArrayList<Character> guessedWrong = new ArrayList<Character>(); // holds the letters guessed wrong by
                                                                                    // user
+    private static ArrayList<Character> notGuessed = new ArrayList<Character>(); // holds all the alphabet values
     private static File hangmanFile; // holds the text file with the list of words
     private static final int MAX_WRONG = 6;
+    private static final int A_ASCII = 97, Z_ASCII = 122;
+    private static final char SPACE_CHAR = ' ', NEWLINE_CHAR = '\n', BLANK_CHAR = '_';
     private static final String INSTRUCTIONS = "Select a topic for the hangman game and enter the topic (exactly as shown below) in the console:"
-            + "\nColors, Countries, Elements, League Champions, Marvel Characters, Religions, Sports"
-            + "\nType \"exit\" to exit the game";
+            + "\nColors, Countries, Elements, League, Marvel, Religions, Sports" + "\nType \"exit\" to exit the game";
     private static final String COLOR_FILE = "./Java_Hangman_Colors.txt", COLOR_TOPIC = "colors";
     private static final String COUNTRY_FILE = "./Java_Hangman_Countries.txt", COUNTRY_TOPIC = "countries";
     private static final String ELEMENT_FILE = "./Java_Hangman_Elements.txt", ELEMENT_TOPIC = "elements";
-    private static final String LEAGUE_FILE = "./Java_Hangman_League.txt", LEAGUE_TOPIC = "league champions";
-    private static final String MARVEL_FILE = "./Java_Hangman_Marvel.txt", MARVEL_TOPIC = "marvel characters";
+    private static final String LEAGUE_FILE = "./Java_Hangman_League.txt", LEAGUE_TOPIC = "league";
+    private static final String MARVEL_FILE = "./Java_Hangman_Marvel.txt", MARVEL_TOPIC = "marvel";
     private static final String RELIGION_FILE = "./Java_Hangman_Religions.txt", RELIGION_TOPIC = "religions";
     private static final String SPORT_FILE = "./Java_Hangman_Sports.txt", SPORT_TOPIC = "sports";
-    private static final String EXIT = "exit";
-    private static final String TOPIC_DNE = "This topic does not exist";
-    private static final Character SPACE_CHAR = ' ';
+    private static final String EXIT = "exit", TOPIC_DNE = "This topic does not exist";
     private static final String TOP_POLE = " ________", BOTTOM_POLE = "|___________";
     private static final String HANGMAN_POLE = "|       |", HANGMAN_LEFT_POLE = "|";
-    private static final String HANGMAN_HEAD = "|       O";
+    private static final String HANGMAN_HEAD = "|       O", HANGMAN_BODY = "|       |";
     private static final String HANGMAN_HAND_LEFT = "|    ---|", HANGMAN_HAND_BOTH = "|    ---|---";
     private static final String HANGMAN_LEFT_LEG_ONE = "|      /", HANGMAN_LEFT_LEG_TWO = "|     /";
     private static final String HANGMAN_BOTH_LEG_ONE = "|      / \\", HANGMAN_BOTH_LEG_TWO = "|     /   \\";
+    private static final String NOT_GUESSED = "\n\nLetters Not Guessed: ",
+            LETTERS_GUESSED = "\nLetters Guessed Wrong: ";
+    private static final String PICK_LETTERS = "\nPick a letter:";
+    private static final String LOSE_MESSAGE = "Game Over. Play Again!", CORRECT_ANSWER = "Correct Answer: ";
+    private static final String WIN_MESSAGE = "Nice Job!";
 
     public static void main(String[] args) throws FileNotFoundException {
         boolean playGame = true; // runs the game until the user wants to stop
@@ -43,6 +48,10 @@ public class Hangman {
         Scanner scan = new Scanner(System.in);
         // run loop until the user wants to stop playing
         while (playGame == true) {
+            // initialise notGuessed
+            for (int ascii = A_ASCII; ascii <= Z_ASCII; ascii++) {
+                notGuessed.add((char) ascii);
+            }
             // Initial Instructions
             System.out.println(INSTRUCTIONS);
             // Retrieve topic from user
@@ -53,21 +62,26 @@ public class Hangman {
             while (guessingPhase == true) {
                 printHangman(); // print hangman figure
                 printWord(); // print the word using blanks or letters
-                // print the letters guessed by users
-                System.out.print("\n\nLetters Guessed: ");
-                for (int i = 0; i < guessed.size(); i++) {
-                    System.out.print(guessed.get(i) + " ");
+                // print the letters not guessed yet
+                System.out.print(NOT_GUESSED);
+                for (int index = 0; index < notGuessed.size(); index++) {
+                    System.out.print("" + notGuessed.get(index) + SPACE_CHAR);
                 }
-                // if the user exceeds 5 wrong guesses, the guessing phase is over and they lose
+                // print the letters guessed by users
+                System.out.print(LETTERS_GUESSED);
+                for (int index = 0; index < guessedWrong.size(); index++) {
+                    System.out.print("" + guessedWrong.get(index) + SPACE_CHAR);
+                }
+                // if the user exceeds 6 wrong guesses, the guessing phase is over and they lose
                 if (guessedWrongNum == MAX_WRONG) {
                     System.out.println();
                     guessingPhase = false;
                     break;
                 }
                 // Retrieve letter from user
-                System.out.println("\nPick a letter:");
-                Scanner guess = new Scanner(System.in);
-                char guessedLetter = guess.next().charAt(0);
+                System.out.println(PICK_LETTERS);
+                char guessedLetter = scan.next().charAt(0);
+                notGuessed.remove((Character) guessedLetter);
                 if (guessed.contains(guessedLetter) == false) {
                     guessed.add(guessedLetter);
                 }
@@ -82,16 +96,18 @@ public class Hangman {
             }
             // print win or lose message after the game
             if (guessedWrongNum == MAX_WRONG) {
-                System.out.println("Game Over. Play Again!");
-                System.out.println("Correct Answer: " + word);
+                System.out.println(LOSE_MESSAGE);
+                System.out.println(CORRECT_ANSWER + word);
             } else {
-                System.out.println("Nice Job!");
+                System.out.println(WIN_MESSAGE);
             }
             // reset all variables for a new round
             guessingPhase = true;
             guessedWrongNum = 0;
             allWords.clear();
             guessedWrong.clear();
+            guessed.clear();
+            notGuessed.clear();
             individualLetters = null;
         }
         scan.close();
@@ -99,89 +115,46 @@ public class Hangman {
 
     // print hangman figure based on wrong guesses
     public static void printHangman() {
+        String bodyOne = HANGMAN_LEFT_POLE + NEWLINE_CHAR + HANGMAN_LEFT_POLE + NEWLINE_CHAR + HANGMAN_LEFT_POLE
+                + NEWLINE_CHAR + HANGMAN_LEFT_POLE;
+        String bodyTwo = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_LEFT_POLE + NEWLINE_CHAR + HANGMAN_LEFT_POLE
+                + NEWLINE_CHAR + HANGMAN_LEFT_POLE;
+        String bodyThree = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_BODY + NEWLINE_CHAR + HANGMAN_LEFT_POLE + NEWLINE_CHAR
+                + HANGMAN_LEFT_POLE;
+        String bodyFour = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_HAND_LEFT + NEWLINE_CHAR + HANGMAN_LEFT_POLE
+                + NEWLINE_CHAR + HANGMAN_LEFT_POLE;
+        String bodyFive = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_HAND_BOTH + NEWLINE_CHAR + HANGMAN_LEFT_POLE
+                + NEWLINE_CHAR + HANGMAN_LEFT_POLE;
+        String bodySix = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_HAND_BOTH + NEWLINE_CHAR + HANGMAN_LEFT_LEG_ONE
+                + NEWLINE_CHAR + HANGMAN_LEFT_LEG_TWO;
+        String bodySeven = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_HAND_BOTH + NEWLINE_CHAR + HANGMAN_BOTH_LEG_ONE
+                + NEWLINE_CHAR + HANGMAN_BOTH_LEG_TWO;
+        String[] bodies = { bodyOne, bodyTwo, bodyThree, bodyFour, bodyFive, bodySix, bodySeven };
 
-        switch (guessedWrongNum) {
-        case 0:
-            System.out.println(TOP_POLE);
-            System.out.println(HANGMAN_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(BOTTOM_POLE);
-            break;
-        case 1:
-            System.out.println(TOP_POLE);
-            System.out.println(HANGMAN_POLE);
-            System.out.println(HANGMAN_HEAD);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(BOTTOM_POLE);
-            break;
-        case MAX_WRONG - 1 - 1 - 1 - 1:
-            System.out.println(TOP_POLE);
-            System.out.println(HANGMAN_POLE);
-            System.out.println(HANGMAN_HEAD);
-            System.out.println(HANGMAN_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(BOTTOM_POLE);
-            break;
-        case MAX_WRONG - 1 - 1 - 1:
-            System.out.println(TOP_POLE);
-            System.out.println(HANGMAN_POLE);
-            System.out.println(HANGMAN_HEAD);
-            System.out.println(HANGMAN_HAND_LEFT);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(BOTTOM_POLE);
-            break;
-        case MAX_WRONG - 1 - 1:
-            System.out.println(TOP_POLE);
-            System.out.println(HANGMAN_POLE);
-            System.out.println(HANGMAN_HEAD);
-            System.out.println(HANGMAN_HAND_BOTH);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(HANGMAN_LEFT_POLE);
-            System.out.println(BOTTOM_POLE);
-            break;
-        case MAX_WRONG - 1:
-            System.out.println(TOP_POLE);
-            System.out.println(HANGMAN_POLE);
-            System.out.println(HANGMAN_HEAD);
-            System.out.println(HANGMAN_HAND_BOTH);
-            System.out.println(HANGMAN_LEFT_LEG_ONE);
-            System.out.println(HANGMAN_LEFT_LEG_TWO);
-            System.out.println(BOTTOM_POLE);
-            break;
-        case MAX_WRONG:
-            System.out.println(TOP_POLE);
-            System.out.println(HANGMAN_POLE);
-            System.out.println(HANGMAN_HEAD);
-            System.out.println(HANGMAN_HAND_BOTH);
-            System.out.println(HANGMAN_BOTH_LEG_ONE);
-            System.out.println(HANGMAN_BOTH_LEG_TWO);
-            System.out.println(BOTTOM_POLE);
-            break;
+        for (int count = 0; count <= MAX_WRONG; count++) {
+            if (guessedWrongNum == count) {
+                System.out.println(TOP_POLE);
+                System.out.println(HANGMAN_POLE);
+                System.out.println(bodies[count]);
+                System.out.println(BOTTOM_POLE);
+            }
         }
-
     }
 
     // print the word using blanks and letters
     public static void printWord() {
         System.out.println();
-        for (int i = 0; i < word.length(); i++) {
-            if (word.charAt(i) == SPACE_CHAR) {
-                System.out.print("  "); // print a space if the word itself has a space
+        for (int index = 0; index < individualLetters.length; index++) {
+            if (individualLetters[index] == SPACE_CHAR) {
+                System.out.print("" + SPACE_CHAR + SPACE_CHAR); // print a space if the word itself has a space
             } else {
-                if (guessed.contains(individualLetters[i])) {
-                    System.out.print(individualLetters[i]); // print the letter if it has been guessed
+                if (guessed.contains(individualLetters[index])) {
+                    System.out.print(individualLetters[index]); // print the letter if it has been guessed
                 } else {
-                    System.out.print("__"); // print a blank if the letter has not been guessed
+                    System.out.print("" + BLANK_CHAR + BLANK_CHAR); // print a blank if the letter has not been guessed
                 }
             }
-            System.out.print("  ");
+            System.out.print("" + SPACE_CHAR + SPACE_CHAR);
         }
     }
 
@@ -238,13 +211,12 @@ public class Hangman {
 
     // check if the user has won the game
     public static boolean checkCompletion() {
-        for (int i = 0; i < individualLetters.length; i++) {
-            // check if the value of the array null (occurs when there is a space in the
-            // word)
-            if (individualLetters[i] == SPACE_CHAR) {
+        for (int index = 0; index < individualLetters.length; index++) {
+            // skip if the value of the array is a space
+            if (individualLetters[index] == SPACE_CHAR) {
                 continue;
             }
-            if (guessed.contains(individualLetters[i])) {
+            if (guessed.contains(individualLetters[index])) {
 
             } else {
                 return false;
@@ -255,17 +227,17 @@ public class Hangman {
 
     // check if the letter guessed is wrong
     public static void wrongGuesses() {
-        for (int i = 0; i < guessed.size(); i++) {
+        for (int index = 0; index < guessed.size(); index++) {
             boolean checkLetter = false;
-            for (int j = 0; j < individualLetters.length; j++) {
-                if (guessed.get(i) == individualLetters[j]) {
+            for (int indexTwo = 0; indexTwo < individualLetters.length; indexTwo++) {
+                if (guessed.get(index) == individualLetters[indexTwo]) {
                     checkLetter = true;
                     break;
                 }
             }
             if (checkLetter == false) {
-                if (guessedWrong.contains(guessed.get(i)) == false) {
-                    guessedWrong.add(guessed.get(i));
+                if (guessedWrong.contains(guessed.get(index)) == false) {
+                    guessedWrong.add(guessed.get(index));
                     guessedWrongNum++;
                 }
             }
