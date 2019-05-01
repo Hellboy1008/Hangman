@@ -32,6 +32,9 @@ public class Hangman {
     // character value for blank alphabets
     private static final char BLANK_CHAR = '_';
 
+    // keeps track of whether the game is over or not
+    private static boolean noGame = false;
+
     // holds the word the user is trying to guess
     private static String word;
     // message holding instructions
@@ -76,7 +79,7 @@ public class Hangman {
         // scanner for reading user input
         Scanner scan;
         // run loop until the program is halted
-        while (true) {
+        while (noGame == false) {
             // initialize notGuessed
             for (int ascii = A_ASCII; ascii <= Z_ASCII; ascii++) {
                 notGuessed.add((char) ascii);
@@ -202,7 +205,8 @@ public class Hangman {
             hangmanFile = new File(filePath);
             break;
         case EXIT:
-            System.exit(0);
+            noGame = true;
+            return;
         default:
             System.out.println(TOPIC_DNE);
             hangmanFile = null;
