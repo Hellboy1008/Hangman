@@ -45,9 +45,8 @@ public class Hangman {
     private static final String GUESSED_WRONG = "\nLetters Guessed Wrong: ";
     // message holding instruction
     private static final String INSTRUCTION = "Select a topic for the hangman game "
-            + "and enter the topic (exactly as shown below) in the console:" + NEWLINE_CHAR
-            + "Colors, Countries, Elements, League, Marvel, Religions, Sports" + NEWLINE_CHAR
-            + "Type \"exit\" to exit the game";
+            + "and enter the topic (exactly as shown below) in the console:\n"
+            + "Colors, Countries, Elements, League, Marvel, Religions, Sports\n" + "Type \"exit\" to exit the game";
     // message for letters not guessed by user
     private static final String NOT_GUESSED = "\nLetters Not Guessed: ";
     // message for users when they chose their letters
@@ -135,7 +134,7 @@ public class Hangman {
             }
             // Retrieve letter from user and check for wrong guesses
             getCharacter();
-            wrongGuesses(); //START HERE
+            wrongGuesses(); // START HERE
             // check if the user has won
             if (checkCompletion() == true) {
                 printHangman();
