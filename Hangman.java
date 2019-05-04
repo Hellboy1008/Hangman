@@ -48,7 +48,7 @@ public class Hangman {
             + "and enter the topic (exactly as shown below) in the console:\n"
             + "Colors, Countries, Elements, League, Marvel, Religions, Sports\n" + "Type \"exit\" to exit the game";
     // message for letters not guessed by user
-    private static final String NOT_GUESSED = "\nLetters Not Guessed: ";
+    private static final String NOT_GUESSED = "\n\nLetters Not Guessed: ";
     // message for users when they chose their letters
     private static final String PICK_LETTERS = "\nPick a letter:";
     // message for invalid topic
@@ -68,11 +68,12 @@ public class Hangman {
     // scanner used for reading user input and files
     private static Scanner scan;
 
-    private static String hangmanBase = " ________\n" + "|       |\n" + "|      %s\n" + "|      %s\n" + "|      %s\n"
-            + "|      %s\n" + "|___________";
+    private static String hangmanBase = " ________\n" + "|       |\n" + "|       %s\n" + "|    %s\n" + "|      %s\n"
+            + "|     %s\n" + "|___________\n";
     private static final String[] HANGMAN_HEAD = { "", "O", "O", "O", "O", "O", "O" };
     private static final String[] HANGMAN_BODY = { "", "", "   |", "---|", "---|---", "---|---", "---|---" };
-    private static final String[] HANGMAN_LEG = { "", "", "", "", "", "/", "/   \\" };
+    private static final String[] HANGMAN_TOP_LEG = { "", "", "", "", "", "/", "/ \\" };
+    private static final String[] HANGMAN_BOTTOM_LEG = { "", "", "", "", "", "/", "/   \\" };
 
     private static final String LOSE_MESSAGE = "\nGame Over. Play Again!", CORRECT_ANSWER = "Correct Answer: ";
     private static final String WIN_MESSAGE = "Nice Job!";
@@ -177,30 +178,34 @@ public class Hangman {
     public static void printHangman() {
         // the number of wrong guesses
         int wrongNum = guessedWrong.size();
-        System.out.print(wrongNum);
+        // the update hangman base
+        String hangman;
 
-        hangmanBase = String.format(hangmanBase, HANGMAN_HEAD[wrongNum], HANGMAN_BODY[wrongNum], HANGMAN_LEG[wrongNum],
-                HANGMAN_LEG[wrongNum]);
-        System.out.println(hangmanBase);
+        // format and print the hangman base
+        hangman = String.format(hangmanBase, HANGMAN_HEAD[wrongNum], HANGMAN_BODY[wrongNum], HANGMAN_TOP_LEG[wrongNum],
+                HANGMAN_BOTTOM_LEG[wrongNum]);
+        System.out.println(hangman);
+        // print word under the hangman
         printWord();
     }
 
     // print the word using blanks and letters
     public static void printWord() {
-        System.out.println();
+        // print the letter if guessed, blank if not
         for (int index = 0; index < word.length(); index++) {
+            // check if the word contains a space
             if (word.charAt(index) == SPACE_CHAR) {
-                System.out.print("" + SPACE_CHAR + SPACE_CHAR); // print a space if the word itself has a space
+                System.out.print("" + SPACE_CHAR + SPACE_CHAR);
+            } else if (guessed.contains(word.charAt(index))) {
+                // print the letter if it was guessed
+                System.out.print(word.charAt(index));
             } else {
-                if (guessed.contains(word.charAt(index))) {
-                    System.out.print(word.charAt(index)); // print the letter if it has been guessed
-                } else {
-                    System.out.print("" + BLANK_CHAR + BLANK_CHAR); // print a blank if the letter has not been guessed
-                }
+                // print a blank if letter has not been guessed
+                System.out.print("" + BLANK_CHAR + BLANK_CHAR);
             }
+            // print a space in between each letter
             System.out.print("" + SPACE_CHAR + SPACE_CHAR);
         }
-        System.out.println();
     }
 
     // check if the user has won the game
