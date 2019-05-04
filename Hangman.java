@@ -2,7 +2,7 @@
 /**
  * Created by: 龍ONE
  * Date Created: October 9, 2018
- * Date Edited: April 28, 2019
+ * Date Edited: May 3, 2019
  * Purpose: Run a Hangman game on the console using text files with
  *          predetermined words.
  */
@@ -68,12 +68,11 @@ public class Hangman {
     // scanner used for reading user input and files
     private static Scanner scan;
 
-    private static final String TOP_POLE = " ________", BOTTOM_POLE = "|___________";
-    private static final String HANGMAN_POLE = "|       |", HANGMAN_LEFT_POLE = "|";
-    private static final String HANGMAN_HEAD = "|       O", HANGMAN_BODY = "|       |";
-    private static final String HANGMAN_HAND_LEFT = "|    ---|", HANGMAN_HAND_BOTH = "|    ---|---";
-    private static final String HANGMAN_LEFT_LEG_ONE = "|      /", HANGMAN_LEFT_LEG_TWO = "|     /";
-    private static final String HANGMAN_BOTH_LEG_ONE = "|      / \\", HANGMAN_BOTH_LEG_TWO = "|     /   \\";
+    private static String hangmanBase = " ________\n" + "|       |\n" + "|      %s\n" + "|      %s\n" + "|      %s\n"
+            + "|      %s\n" + "|___________";
+    private static final String[] HANGMAN_HEAD = { "", "O", "O", "O", "O", "O", "O" };
+    private static final String[] HANGMAN_BODY = { "", "", "   |", "---|", "---|---", "---|---", "---|---" };
+    private static final String[] HANGMAN_LEG = { "", "", "", "", "", "/", "/   \\" };
 
     private static final String LOSE_MESSAGE = "\nGame Over. Play Again!", CORRECT_ANSWER = "Correct Answer: ";
     private static final String WIN_MESSAGE = "Nice Job!";
@@ -134,14 +133,15 @@ public class Hangman {
             }
             // Retrieve letter from user and check for wrong guesses
             getCharacter();
-            wrongGuesses(); // START HERE
+            wrongGuesses();
             // check if the user has won
             if (checkCompletion() == true) {
                 printHangman();
                 guessingPhase = false;
             }
         }
-        // print win or lose message after the game
+
+        // print win or lose message
         if (guessedWrong.size() == MAX_WRONG) {
             System.out.println(LOSE_MESSAGE);
             System.out.println(CORRECT_ANSWER + word + NEWLINE_CHAR);
@@ -175,31 +175,13 @@ public class Hangman {
 
     // print hangman figure based on wrong guesses
     public static void printHangman() {
-        String bodyOne = HANGMAN_LEFT_POLE + NEWLINE_CHAR + HANGMAN_LEFT_POLE + NEWLINE_CHAR + HANGMAN_LEFT_POLE
-                + NEWLINE_CHAR + HANGMAN_LEFT_POLE;
-        String bodyTwo = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_LEFT_POLE + NEWLINE_CHAR + HANGMAN_LEFT_POLE
-                + NEWLINE_CHAR + HANGMAN_LEFT_POLE;
-        String bodyThree = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_BODY + NEWLINE_CHAR + HANGMAN_LEFT_POLE + NEWLINE_CHAR
-                + HANGMAN_LEFT_POLE;
-        String bodyFour = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_HAND_LEFT + NEWLINE_CHAR + HANGMAN_LEFT_POLE
-                + NEWLINE_CHAR + HANGMAN_LEFT_POLE;
-        String bodyFive = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_HAND_BOTH + NEWLINE_CHAR + HANGMAN_LEFT_POLE
-                + NEWLINE_CHAR + HANGMAN_LEFT_POLE;
-        String bodySix = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_HAND_BOTH + NEWLINE_CHAR + HANGMAN_LEFT_LEG_ONE
-                + NEWLINE_CHAR + HANGMAN_LEFT_LEG_TWO;
-        String bodySeven = HANGMAN_HEAD + NEWLINE_CHAR + HANGMAN_HAND_BOTH + NEWLINE_CHAR + HANGMAN_BOTH_LEG_ONE
-                + NEWLINE_CHAR + HANGMAN_BOTH_LEG_TWO;
-        String[] bodies = { bodyOne, bodyTwo, bodyThree, bodyFour, bodyFive, bodySix, bodySeven };
+        // the number of wrong guesses
+        int wrongNum = guessedWrong.size();
+        System.out.print(wrongNum);
 
-        for (int count = 0; count <= MAX_WRONG; count++) {
-            if (guessedWrong.size() == count) {
-                System.out.println(TOP_POLE);
-                System.out.println(HANGMAN_POLE);
-                System.out.println(bodies[count]);
-                System.out.println(BOTTOM_POLE);
-            }
-        }
-
+        hangmanBase = String.format(hangmanBase, HANGMAN_HEAD[wrongNum], HANGMAN_BODY[wrongNum], HANGMAN_LEG[wrongNum],
+                HANGMAN_LEG[wrongNum]);
+        System.out.println(hangmanBase);
         printWord();
     }
 
@@ -228,9 +210,8 @@ public class Hangman {
             if (word.charAt(index) == SPACE_CHAR) {
                 continue;
             }
-            if (guessed.contains(word.charAt(index))) {
-
-            } else {
+            // return false if character has not been guessed yet
+            if (!guessed.contains(word.charAt(index))) {
                 return false;
             }
         }
@@ -239,21 +220,38 @@ public class Hangman {
 
     // check if the letter guessed is wrong
     public static void wrongGuesses() {
-        // CHECK FOR NON-LETTER INPUT
-        for (int index = 0; index < guessed.size(); index++) {
-            boolean checkLetter = false;
+        // whether the letter is a letter in the word being guessed
+        boolean checkLetter;
+        // character guessed by user
+        char guessedChar;
+
+        // check to see if the characters guessed by the user is wrong
+        for (int indexOne = 0; indexOne < guessed.size(); indexOne++) {
+            checkLetter = false;
+            guessedChar = guessed.get(indexOne);
+            // check if the character exists in word
             for (int indexTwo = 0; indexTwo < word.length(); indexTwo++) {
-                if (guessed.get(index) == word.charAt(indexTwo)) {
+                if (guessedChar == word.charAt(indexTwo)) {
                     checkLetter = true;
                     break;
                 }
             }
-            if (checkLetter == false) {
-                if (guessedWrong.contains(guessed.get(index)) == false) {
-                    guessedWrong.add(guessed.get(index));
+            // check if the character is a wrong letter
+            if (checkLetter == false && isLetter(guessedChar)) {
+                // check if the arrayList already contains the letter
+                if (guessedWrong.contains(guessedChar) == false) {
+                    guessedWrong.add(guessedChar);
                 }
             }
         }
+    }
+
+    private static boolean isLetter(char character) {
+        // check if character is a letter
+        if ((int) character < A_ASCII || (int) character > Z_ASCII) {
+            return false;
+        }
+        return true;
     }
 
     /**
