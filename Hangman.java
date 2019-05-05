@@ -2,7 +2,7 @@
 /**
  * Created by: 龍ONE
  * Date Created: October 9, 2018
- * Date Edited: May 3, 2019
+ * Date Edited: May 4, 2019
  * Purpose: Run a Hangman game on the console using text files with
  *          predetermined words.
  */
@@ -41,6 +41,9 @@ public class Hangman {
     private static String filePath = "./Java_Hangman_%s.txt";
     // word the user is trying to guess
     private static String word;
+    // the base format for the hangman
+    private static String hangmanBase = " ________\n" + "|       |\n" + "|       %s\n" + "|    %s\n" + "|      %s\n"
+            + "|     %s\n" + "|___________\n";
     // message for letters guessed wrong by user
     private static final String GUESSED_WRONG = "\nLetters Guessed Wrong: ";
     // message holding instruction
@@ -53,10 +56,20 @@ public class Hangman {
     private static final String PICK_LETTERS = "\nPick a letter:";
     // message for invalid topic
     private static final String TOPIC_DNE = "This topic does not exist. Please enter a valid topic.";
+    // message displayed when the user loses
+    private static final String LOSE_MESSAGE = "\nGame Over. Play Again!\nCorrect Answer: ";
+    // message displayed when the user wins
+    private static final String WIN_MESSAGE = "Nice Job!";
 
     // holds all the topics and edge cases
     private static final String[] TOPICS = { "Colors", "Countries", "Elements", "League", "Marvel", "Religions",
             "Sports", "exit" };
+
+    // holds the different outputs for each hangman variation
+    private static final String[] HANGMAN_HEAD = { "", "O", "O", "O", "O", "O", "O" };
+    private static final String[] HANGMAN_BODY = { "", "", "   |", "---|", "---|---", "---|---", "---|---" };
+    private static final String[] HANGMAN_TOP_LEG = { "", "", "", "", "", "/", "/ \\" };
+    private static final String[] HANGMAN_BOTTOM_LEG = { "", "", "", "", "", "/", "/   \\" };
 
     // holds all the alphabets guessed by user
     private static ArrayList<Character> guessed = new ArrayList<Character>();
@@ -67,16 +80,6 @@ public class Hangman {
 
     // scanner used for reading user input and files
     private static Scanner scan;
-
-    private static String hangmanBase = " ________\n" + "|       |\n" + "|       %s\n" + "|    %s\n" + "|      %s\n"
-            + "|     %s\n" + "|___________\n";
-    private static final String[] HANGMAN_HEAD = { "", "O", "O", "O", "O", "O", "O" };
-    private static final String[] HANGMAN_BODY = { "", "", "   |", "---|", "---|---", "---|---", "---|---" };
-    private static final String[] HANGMAN_TOP_LEG = { "", "", "", "", "", "/", "/ \\" };
-    private static final String[] HANGMAN_BOTTOM_LEG = { "", "", "", "", "", "/", "/   \\" };
-
-    private static final String LOSE_MESSAGE = "\nGame Over. Play Again!", CORRECT_ANSWER = "Correct Answer: ";
-    private static final String WIN_MESSAGE = "Nice Job!";
 
     /**
      * The main method that runs user input for the hangman game.
@@ -110,6 +113,84 @@ public class Hangman {
         scan.close();
     }
 
+    /**
+     * This method checks if the user has won the game.
+     * 
+     * @param None
+     * @return True if the user has won the game, false if not
+     */
+    public static boolean checkCompletion() {
+        for (int index = 0; index < word.length(); index++) {
+            // skip if the value of the array is a space
+            if (word.charAt(index) == SPACE_CHAR) {
+                continue;
+            }
+            // return false if character has not been guessed yet
+            if (!guessed.contains(word.charAt(index))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * This method determines the word for the Hangman game based on the parameter
+     * topic.
+     * 
+     * @param topic The topic chosen by the user
+     * @throws FileNotFoundException
+     * @return None
+     */
+    public static void determineWord(String topic) throws FileNotFoundException {
+        // all the words in one given topic
+        ArrayList<String> allWords = new ArrayList<String>();
+        // text file with the list of possible words
+        File hangmanFile;
+
+        // exit method if the game is not being played
+        if (playGame == false) {
+            return;
+        }
+        // determine file path for the topic
+        hangmanFile = new File(String.format(filePath, topic));
+        // scan file for words
+        scan = new Scanner(hangmanFile);
+        while (scan.hasNextLine()) {
+            allWords.add(scan.nextLine());
+        }
+        // chose a random word
+        word = allWords.get((int) (Math.random() * allWords.size()));
+        word = word.toLowerCase();
+    }
+
+    /**
+     * This method gets a character from the user.
+     * 
+     * @param None
+     * @return None
+     */
+    private static void getCharacter() {
+        // the character guessed by the user
+        char guessedLetter;
+        // scanner for user input
+        scan = new Scanner(System.in);
+
+        // get user input
+        System.out.println(PICK_LETTERS);
+        guessedLetter = scan.next().charAt(0);
+        // remove character from the notGuessed list and add it to the guessed list
+        notGuessed.remove((Character) guessedLetter);
+        if (guessed.contains(guessedLetter) == false) {
+            guessed.add(guessedLetter);
+        }
+    }
+
+    /**
+     * This method runs the guessing phase for each individual game.
+     * 
+     * @param None
+     * @return None
+     */
     private static void guessingPhase() {
         // exit if guessing phase is not in progress
         if (guessingPhase == false) {
@@ -144,13 +225,33 @@ public class Hangman {
 
         // print win or lose message
         if (guessedWrong.size() == MAX_WRONG) {
-            System.out.println(LOSE_MESSAGE);
-            System.out.println(CORRECT_ANSWER + word + NEWLINE_CHAR);
+            System.out.println(LOSE_MESSAGE + word + NEWLINE_CHAR);
         } else {
             System.out.println(WIN_MESSAGE + NEWLINE_CHAR);
         }
     }
 
+    /**
+     * This method checks if the parameter character is a letter.
+     * 
+     * @param character The character being checked
+     * @return True if the character is a letter, false if not
+     */
+    private static boolean isLetter(char character) {
+        // check if character is a letter
+        if ((int) character < A_ASCII || (int) character > Z_ASCII) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * This method prints a character arrayList along with a message.
+     * 
+     * @param message The message to be printed
+     * @param list    The list to be printed
+     * @return None.
+     */
     private static void printCharArrayList(String message, ArrayList<Character> list) {
         System.out.print(message);
         for (int index = 0; index < list.size(); index++) {
@@ -158,23 +259,12 @@ public class Hangman {
         }
     }
 
-    private static void getCharacter() {
-        // the character guessed by the user
-        char guessedLetter;
-        // scanner for user input
-        scan = new Scanner(System.in);
-
-        // get user input
-        System.out.println(PICK_LETTERS);
-        guessedLetter = scan.next().charAt(0);
-        // remove character from the notGuessed list and add it to the guessed list
-        notGuessed.remove((Character) guessedLetter);
-        if (guessed.contains(guessedLetter) == false) {
-            guessed.add(guessedLetter);
-        }
-    }
-
-    // print hangman figure based on wrong guesses
+    /**
+     * This method prints the hangman figure based on the number of wrong guesses.
+     * 
+     * @param None
+     * @return None
+     */
     public static void printHangman() {
         // the number of wrong guesses
         int wrongNum = guessedWrong.size();
@@ -189,7 +279,12 @@ public class Hangman {
         printWord();
     }
 
-    // print the word using blanks and letters
+    /**
+     * This method prints the word being guessed using blanks and letters.
+     * 
+     * @param None
+     * @return None
+     */
     public static void printWord() {
         // print the letter if guessed, blank if not
         for (int index = 0; index < word.length(); index++) {
@@ -208,22 +303,37 @@ public class Hangman {
         }
     }
 
-    // check if the user has won the game
-    public static boolean checkCompletion() {
-        for (int index = 0; index < word.length(); index++) {
-            // skip if the value of the array is a space
-            if (word.charAt(index) == SPACE_CHAR) {
-                continue;
-            }
-            // return false if character has not been guessed yet
-            if (!guessed.contains(word.charAt(index))) {
-                return false;
+    /**
+     * This method checks whether or not the topic inputted by user is valid.
+     * 
+     * @param topic The topic inputted by the user
+     * @return True if the topic is valid, false if not
+     */
+    private static boolean validTopic(String topic) {
+        // check if the topic is valid
+        for (int index = 0; index < TOPICS.length - 1; index++) {
+            if (topic.equals(TOPICS[index])) {
+                return true;
             }
         }
-        return true;
+
+        // check if the topic is "exit"
+        if (topic.equals(TOPICS[TOPICS.length - 1])) {
+            guessingPhase = false;
+            playGame = false;
+            return true;
+        }
+
+        System.out.println(TOPIC_DNE + NEWLINE_CHAR);
+        return false;
     }
 
-    // check if the letter guessed is wrong
+    /**
+     * This method checks if the letters guessed by the user is wrong.
+     * 
+     * @param None
+     * @return None
+     */
     public static void wrongGuesses() {
         // whether the letter is a letter in the word being guessed
         boolean checkLetter;
@@ -249,67 +359,5 @@ public class Hangman {
                 }
             }
         }
-    }
-
-    private static boolean isLetter(char character) {
-        // check if character is a letter
-        if ((int) character < A_ASCII || (int) character > Z_ASCII) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Checks whether or not the topic inputted by user is valid.
-     * 
-     * @param topic The topic inputted by the user
-     * @return True if the topic is valid, false if not
-     */
-    private static boolean validTopic(String topic) {
-        // check if the topic is valid
-        for (int index = 0; index < TOPICS.length - 1; index++) {
-            if (topic.equals(TOPICS[index])) {
-                return true;
-            }
-        }
-
-        // check if the topic is "exit"
-        if (topic.equals(TOPICS[TOPICS.length - 1])) {
-            guessingPhase = false;
-            playGame = false;
-            return true;
-        }
-
-        System.out.println(TOPIC_DNE + NEWLINE_CHAR);
-        return false;
-    }
-
-    /**
-     * Determine the word for the Hangman game based on the parameter topic
-     * 
-     * @param topic The topic chosen by the user
-     * @throws FileNotFoundException
-     * @return None
-     */
-    public static void determineWord(String topic) throws FileNotFoundException {
-        // all the words in one given topic
-        ArrayList<String> allWords = new ArrayList<String>();
-        // text file with the list of possible words
-        File hangmanFile;
-
-        // exit method if the game is not being played
-        if (playGame == false) {
-            return;
-        }
-        // determine file path for the topic
-        hangmanFile = new File(String.format(filePath, topic));
-        // scan file for words
-        scan = new Scanner(hangmanFile);
-        while (scan.hasNextLine()) {
-            allWords.add(scan.nextLine());
-        }
-        // chose a random word
-        word = allWords.get((int) (Math.random() * allWords.size()));
-        word = word.toLowerCase();
     }
 }
