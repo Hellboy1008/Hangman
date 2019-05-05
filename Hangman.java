@@ -2,7 +2,7 @@
 /**
  * Created by: 龍ONE
  * Date Created: October 9, 2018
- * Date Edited: May 4, 2019
+ * Date Edited: May 5, 2019
  * Purpose: Run a Hangman game on the console using text files with
  *          predetermined words.
  */
@@ -84,7 +84,7 @@ public class Hangman {
     /**
      * The main method that runs user input for the hangman game.
      * 
-     * @param args The argument given to the main method
+     * @param args The arguments given to the main method
      * @throws FileNotFoundException
      * @return None
      */
