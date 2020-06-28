@@ -225,9 +225,9 @@ public class Hangman {
 
         // print win or lose message
         if (guessedWrong.size() == MAX_WRONG) {
-            System.out.println(LOSE_MESSAGE + word + NEWLINE_CHAR);
+            System.out.println(NEWLINE_CHAR + LOSE_MESSAGE + word + NEWLINE_CHAR);
         } else {
-            System.out.println(WIN_MESSAGE + NEWLINE_CHAR);
+            System.out.println(NEWLINE_CHAR + WIN_MESSAGE + NEWLINE_CHAR);
         }
     }
 
